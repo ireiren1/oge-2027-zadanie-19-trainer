@@ -1,0 +1,52 @@
+name: Deploy VK Mini App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Unpack trainer
+        run: |
+          mkdir -p deploy/site
+          unzip -q Fizmat_Poima_OGE2027_Zadanie19_Trainer_VK.zip -d deploy/site
+
+      - name: Create VK hosting configuration
+        working-directory: deploy
+        run: |
+          cat > vk-hosting-config.json <<'EOF'
+          {
+            "static_path": "site",
+            "app_id": 54782047,
+            "endpoints": {
+              "mobile": "index.html",
+              "mvk": "index.html",
+              "web": "index.html"
+            },
+            "noprompt": true
+          }
+          EOF
+
+      - name: Install VK deployment tool
+        working-directory: deploy
+        run: |
+          npm init -y
+          npm install --save-dev @vkontakte/vk-miniapps-deploy@1.0.2
+
+      - name: Deploy to VK hosting
+        working-directory: deploy
+        env:
+          MINI_APPS_ACCESS_TOKEN: ${{ secrets.VK_MINI_APPS_TOKEN }}
+          MINI_APPS_ENVIRONMENT: dev
+          CI_URLS: "true"
+        run: npx vk-miniapps-deploy
