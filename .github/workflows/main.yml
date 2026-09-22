@@ -19,7 +19,7 @@ jobs:
       - name: Unpack trainer
         run: |
           mkdir -p deploy/site
-          unzip -q Fizmat_Poima_OGE2027_Trainer_FIXED_v9.zip -d deploy/site
+          unzip -q Fizmat_Poima_OGE2027_Trainer_MODERATION_v11.zip -d deploy/site
 
       - name: Create VK hosting configuration
         working-directory: deploy
